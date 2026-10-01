@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SPACEPROD — Communication & Design Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Instrument+Serif:ital@1&family=Cairo:wght@300;600;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<style>
+/* ============ TOKENS — change the whole identity here ============ */
+:root{--bg:#09060f;--bg2:#150f22;--fg:#f4efe6;--fgd:rgba(244,239,230,.62);--line:rgba(244,239,230,.16);
+ --c1:#ff3d1f;--c2:#3a2bff;--c3:#c9ff2e;--font:'Bricolage Grotesque','Cairo',sans-serif;--serif:'Instrument Serif',serif}
+[data-theme=light]{--bg:#f1ece3;--bg2:#e6dfd2;--fg:#0d0817;--fgd:rgba(13,8,23,.62);--line:rgba(13,8,23,.18)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)} html.lenis{height:auto}
+body{font-family:var(--font);background:var(--bg);color:var(--fg);overflow-x:hidden;transition:background .4s,color .4s}
+a,button{color:inherit;font:inherit;background:none;border:none;cursor:pointer;text-decoration:none}
+::selection{background:var(--c3);color:#000}
+.eyebrow{font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;color:var(--fgd)}
+.wrap{padding:0 5vw}
+.serif{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:0}
+.h2{font-size:clamp(2.6rem,9vw,8rem);font-weight:800;font-stretch:80%;line-height:.88;letter-spacing:-.04em;text-transform:uppercase}
+[lang=ar] .h2,[lang=ar] #heroTitle{letter-spacing:0;line-height:1.1}
+.grain{position:fixed;inset:-10%;z-index:80;opacity:.07;pointer-events:none;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* loader */
+#loader{position:fixed;inset:0;z-index:100;background:var(--c1);color:#09060f;display:flex;align-items:flex-end;justify-content:space-between;padding:5vw;font-weight:800;font-stretch:75%;font-size:clamp(4rem,22vw,18rem);line-height:.8}
+#loader small{font-size:.7rem;letter-spacing:.2em;position:absolute;top:5vw;left:5vw;font-weight:500}
+
+/* header + cursor */
+header{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;justify-content:space-between;align-items:center;padding:1.3rem 5vw;mix-blend-mode:difference;color:#fff}
+.logo{font-weight:800;font-stretch:75%;font-size:1.5rem;letter-spacing:-.02em}
+nav.links{display:none;gap:2rem}
+nav.links button,.langs button,.themebtn{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;opacity:.75}
+nav.links button:hover,.langs button.active{opacity:1}
+.ctrls{display:flex;gap:1rem;align-items:center}.langs{display:none;gap:.6rem}
+#menuBtn{display:flex;flex-direction:column;gap:6px;width:2rem}#menuBtn span{height:2px;background:#fff}
+@media(min-width:1000px){nav.links,.langs{display:flex}#menuBtn{display:none}}
+#mnav{position:fixed;inset:0;z-index:55;background:var(--c2);color:#fff;display:none;flex-direction:column;justify-content:space-between;padding:6rem 5vw 2.5rem}
+#mnav.open{display:flex}
+#mnav .item{display:block;text-align:start;font-size:3rem;font-weight:800;font-stretch:75%;text-transform:uppercase;padding:.5rem 0}
+#mnav .langs{display:flex}
+#cur{position:fixed;left:0;top:0;width:14px;height:14px;border-radius:50%;background:#fff;mix-blend-mode:difference;z-index:99;pointer-events:none;transform:translate(-50%,-50%);display:none}
+@media(hover:hover) and (pointer:fine){#cur{display:block}}
+
+/* hero */
+#hero{position:relative;height:100svh;min-height:560px;overflow:hidden;color:#f4efe6;background:#09060f;display:flex;flex-direction:column;justify-content:flex-end}
+#liquid{position:absolute;inset:0;width:100%;height:100%;display:block}
+.fb{position:absolute;inset:0;display:none;filter:blur(30px);background:radial-gradient(40% 50% at 25% 60%,var(--c2),transparent 70%),radial-gradient(35% 45% at 75% 35%,var(--c1),transparent 70%),radial-gradient(25% 30% at 55% 85%,var(--c3),transparent 70%);animation:fb 14s ease-in-out infinite alternate}
+@keyframes fb{to{transform:scale(1.2) translate(4%,-3%)}}
+#hero.nogl .fb{display:block}
+.hero-in{position:relative;z-index:2;padding:0 5vw 2rem;pointer-events:none}
+#heroTitle{font-size:clamp(4.2rem,24.5vw,30rem);font-weight:800;font-stretch:75%;line-height:.78;letter-spacing:-.05em;display:flex;flex-wrap:wrap;direction:ltr;text-shadow:0 0 60px rgba(9,6,15,.35)}
+#heroTitle span{display:inline-block;overflow:hidden;padding:.04em 0}
+#heroTitle b{display:inline-block;font-weight:inherit;transform:translateY(110%);font-variation-settings:'wght' var(--w,800)}
+.hero-meta{display:flex;justify-content:space-between;align-items:flex-end;gap:1.5rem;flex-wrap:wrap;margin-top:1.8rem;padding-top:1.2rem;border-top:1px solid rgba(244,239,230,.3)}
+.tagline{font-size:clamp(1.6rem,3.4vw,3rem);line-height:1;letter-spacing:-.02em;max-width:28rem;font-weight:500}
+.tagline em{font-family:var(--serif);font-weight:400}
+.hero-eyebrow{position:absolute;z-index:2;top:6rem;left:5vw;right:5vw;display:flex;justify-content:space-between;gap:1rem;font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,239,230,.8)}
+.marq{overflow:hidden;white-space:nowrap;border-block:1px solid var(--line);padding:.9rem 0;font-weight:600;font-stretch:80%;text-transform:uppercase;font-size:1.1rem;letter-spacing:.06em}
+.marq div{display:inline-block;animation:mq 30s linear infinite}.marq span{margin:0 1.4rem}.marq i{color:var(--c1);font-style:normal}
+@keyframes mq{to{transform:translateX(-50%)}}[dir=rtl] .marq div{animation-direction:reverse}
+
+/* manifesto */
+#about{padding:14vh 5vw 12vh}
+.statement{font-size:clamp(1.9rem,5.6vw,5.2rem);font-weight:600;font-stretch:85%;line-height:1;letter-spacing:-.035em;max-width:18em}
+.statement .w{opacity:.14;display:inline-block;margin-inline-end:.25em}
+.statement .w.on{opacity:1}
+.body-text{max-width:26rem;margin-top:2.5rem;margin-inline-start:auto;color:var(--fgd);font-size:1.05rem;line-height:1.5}
+
+/* services */
+#services{padding:10vh 5vw}
+.svc{display:grid;grid-template-columns:3rem 1fr;gap:1rem;align-items:baseline;padding:1.2rem 0;border-top:1px solid var(--line);position:relative;transition:padding .4s cubic-bezier(.16,1,.3,1)}
+.svc:last-child{border-bottom:1px solid var(--line)}
+.svc i{font-style:normal;font-size:.7rem;letter-spacing:.2em;color:var(--fgd)}
+.svc b{font-size:clamp(2.2rem,7vw,6.5rem);font-weight:800;font-stretch:78%;text-transform:uppercase;letter-spacing:-.03em;line-height:.95;transition:color .3s,font-variation-settings .4s}
+.svc p{grid-column:2;max-width:28rem;color:var(--fgd);line-height:1.4;font-size:.95rem;max-height:0;opacity:0;overflow:hidden;transition:max-height .5s,opacity .4s}
+.svc.active p{max-height:8rem;opacity:1;margin-top:.5rem}
+.svc.active b{color:var(--sc)}
+@media(min-width:900px){.svc.active{padding-inline-start:3vw}.svc p{position:absolute;inset-inline-end:0;top:50%;transform:translateY(-50%);grid-column:auto;max-height:none}.svc.active p{margin:0}}
+
+/* STACK (Other-works inspired layered reveal) */
+#stack{position:relative;height:100svh;overflow:hidden;background:var(--bg)}
+.stack-title{position:absolute;inset:auto 5vw 4vh 5vw;display:flex;justify-content:space-between;align-items:flex-end;z-index:0;opacity:0}
+.stack-title .h2{font-size:clamp(3rem,13vw,13rem);opacity:.9}
+.sc{position:absolute;left:50%;top:50%;will-change:transform}
+.sc .media{position:relative;width:100%;overflow:hidden;border-radius:6px;background:var(--bg2);box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+.sc .media>img,.sc .media>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sc .cap{position:absolute;inset:auto 0 0 0;z-index:3;padding:1rem 1.2rem;display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.55))}
+.sc .cap b{font-weight:800;font-stretch:78%;text-transform:uppercase;font-size:clamp(1rem,2vw,1.8rem);letter-spacing:-.02em}
+.sc .cap small{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;opacity:.8}
+/* PLACEHOLDER — put <img>/<video> inside .media (or set src in PROJECTS) and this disappears */
+.ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.75);padding:1rem;
+ background:repeating-linear-gradient(135deg,rgba(255,255,255,.07) 0 1px,transparent 1px 14px),linear-gradient(140deg,var(--pa),var(--pb))}
+.ph::before,.ph::after{content:"";position:absolute;width:18px;height:18px;border:2px solid rgba(255,255,255,.7)}
+.ph::before{top:12px;left:12px;border-right:0;border-bottom:0}.ph::after{bottom:12px;right:12px;border-left:0;border-top:0}
+.ph span{display:block;margin-top:.5rem;opacity:.7}
+.c1{width:56vw;z-index:10}.c1 .media{aspect-ratio:16/10}
+.c2{width:19vw;z-index:4}.c2 .media{aspect-ratio:4/5}
+.c3{width:15vw;z-index:3}.c3 .media{aspect-ratio:1/1}
+.c4{width:24vw;z-index:2}.c4 .media{aspect-ratio:16/10}
+.c5{width:14vw;z-index:1}.c5 .media{aspect-ratio:3/4}
+@media(max-width:800px){.c1{width:78vw}.c1 .media{aspect-ratio:4/5}.c2,.c3,.c4,.c5{width:38vw}.c4 .media{aspect-ratio:4/3}.sc .cap{padding:.6rem}.stack-title{align-items:flex-start;inset:12vh 5vw auto}}
+
+.c2 .cap small,.c3 .cap small,.c4 .cap small,.c5 .cap small{display:none}
+.c2 .ph span,.c3 .ph span,.c4 .ph span,.c5 .ph span{display:none}
+@media(max-width:800px){.stack-title .eyebrow{display:none}.sc .cap b{font-size:.85rem}.ph{font-size:.5rem}}
+/* reel */
+#reel{padding:12vh 5vw;display:grid;gap:3rem;align-items:center;overflow:hidden}
+@media(min-width:900px){#reel{grid-template-columns:7fr 5fr}}
+.reel-frame{justify-self:center;width:min(78vw,340px);aspect-ratio:9/16;border-radius:2rem;overflow:hidden;background:var(--bg2);border:1px solid var(--line);position:relative;transform:rotate(4deg)}
+.reel-frame video{width:100%;height:100%;object-fit:cover;display:block}
+#reel .h2 em{color:var(--c1);font-style:italic;font-family:var(--serif);text-transform:none;font-weight:400;letter-spacing:-.02em}
+
+/* team */
+#team{padding:10vh 5vw}
+.team-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;margin-top:3rem}
+@media(min-width:900px){.team-grid{grid-template-columns:repeat(4,1fr);gap:1.6rem}.team-card:nth-child(even){margin-top:4rem}}
+.team-card .iw{aspect-ratio:3/4;overflow:hidden;border-radius:6px;position:relative}
+.team-card img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.1);transition:filter .5s,transform .8s cubic-bezier(.16,1,.3,1)}
+.team-card .iw::after{content:"";position:absolute;inset:0;background:linear-gradient(160deg,var(--c2),var(--c1));mix-blend-mode:multiply;opacity:.55;transition:opacity .5s}
+.team-card:hover img{filter:none;transform:scale(1.06)}.team-card:hover .iw::after{opacity:0}
+.team-name{font-weight:800;font-stretch:78%;font-size:1.7rem;text-transform:uppercase;margin-top:.8rem;letter-spacing:-.02em}
+.team-role{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--fgd)}
+
+/* cta */
+#cta{background:var(--c1);color:#09060f;padding:12vh 0 8vh;overflow:hidden;text-align:center;position:relative}
+#cta .big{font-size:clamp(3.4rem,17vw,17rem);font-weight:800;font-stretch:75%;line-height:.85;letter-spacing:-.05em;text-transform:uppercase;white-space:nowrap}
+#cta .big .serif{text-transform:none;letter-spacing:-.03em}
+.mail{display:inline-block;margin-top:3rem;font-size:clamp(1.2rem,3.4vw,2.6rem);font-weight:600;letter-spacing:-.02em;padding:1.1rem 2.2rem;border:2px solid #09060f;border-radius:99px;transition:background .3s,color .3s}
+.mail:hover{background:#09060f;color:var(--c1)}
+footer{padding:2rem 5vw;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;background:var(--bg);align-items:center}
+.ig{width:2.8rem;height:2.8rem;border:1px solid var(--line);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transition:background .3s,color .3s}.ig:hover{background:var(--c3);color:#000}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="grain"></div><div id="cur"></div>
+<div id="loader"><small>SPACEPROD / 2026</small><span>SPACE</span><span id="pct">0</span></div>
+
+<header>
+  <button class="logo" data-go="hero" data-c>SPACEPROD</button>
+  <nav class="links">
+    <button data-go="stack" data-k="nav.work"></button><button data-go="about" data-k="nav.about"></button><button data-go="services" data-k="nav.services"></button><button data-go="team" data-k="nav.team"></button><button data-go="cta" data-k="nav.contact"></button>
+  </nav>
+  <div class="ctrls">
+    <div class="langs"><button data-lang="en">EN</button><button data-lang="fr">FR</button><button data-lang="ar">AR</button></div>
+    <button class="themebtn" id="themeBtn" aria-label="Theme">◐</button>
+    <button id="menuBtn" aria-label="Menu"><span></span><span></span></button>
+  </div>
+</header>
+<div id="mnav">
+  <div><button class="item" data-go="stack" data-k="nav.work"></button><button class="item" data-go="about" data-k="nav.about"></button><button class="item" data-go="services" data-k="nav.services"></button><button class="item" data-go="team" data-k="nav.team"></button><button class="item" data-go="cta" data-k="nav.contact"></button></div>
+  <div class="langs"><button data-lang="en">EN</button><button data-lang="fr">FR</button><button data-lang="ar">AR</button><button id="themeBtnM">◐</button></div>
+</div>
+
+<main>
+<section id="hero">
+  <canvas id="liquid"></canvas><div class="fb"></div>
+  <div class="hero-eyebrow"><span data-k="hero.eyebrow"></span><span>Podcast · Photo · Film · Ads · Brand</span></div>
+  <div class="hero-in">
+    <h1 id="heroTitle" aria-label="SPACEPROD"></h1>
+    <div class="hero-meta"><p class="tagline" id="tagline" data-k="hero.tagline"></p><span class="eyebrow" style="color:rgba(244,239,230,.8)" data-k="hero.scroll"></span></div>
+  </div>
+</section>
+<div class="marq" aria-hidden="true"><div id="mq"></div></div>
+
+<section id="about">
+  <p class="eyebrow" style="margin-bottom:2rem" data-k="about.eyebrow"></p>
+  <h2 class="statement" id="statement" data-k="about.statement"></h2>
+  <p class="body-text" data-k="about.body"></p>
+</section>
+
+<section id="services">
+  <p class="eyebrow" style="margin-bottom:1.5rem" data-k="services.eyebrow"></p>
+  <div id="svcList"></div>
+</section>
+
+<!-- LAYERED PROJECT STACK. Edit PROJECTS in the script to drop in media. -->
+<section id="stack">
+  <div class="stack-title"><h2 class="h2" data-k="work.heading"></h2><span class="eyebrow" data-k="work.eyebrow"></span></div>
+</section>
+
+<section id="reel">
+  <div>
+    <p class="eyebrow" style="margin-bottom:1.5rem" data-k="reel.eyebrow"></p>
+    <h2 class="h2" id="reelH"></h2>
+    <p class="body-text" style="margin-inline-start:0" data-k="reel.p"></p>
+  </div>
+  <div class="reel-frame" data-c><video id="reelVid" src="media/reel.mp4" muted loop playsinline preload="none"></video></div>
+</section>
+
+<section id="team">
+  <p class="eyebrow" style="margin-bottom:1.2rem" data-k="team.eyebrow"></p>
+  <h2 class="h2" data-k="team.heading"></h2>
+  <div class="team-grid" id="teamGrid"></div>
+</section>
+
+<section id="cta">
+  <p class="eyebrow" style="color:#09060f;margin-bottom:2rem" data-k="contact.eyebrow"></p>
+  <div class="big" id="ctaBig"><span>Let's make</span> <span class="serif">something</span> <span>worth watching</span></div>
+  <a class="mail" id="mail" href="mailto:hello@spaceprod.studio" data-c>hello@spaceprod.studio</a>
+</section>
+</main>
+<footer>
+  <span>SPACEPROD — <span data-k="footer.tagline"></span></span>
+  <a class="ig" href="https://www.instagram.com/space.prod1/" target="_blank" rel="noreferrer" aria-label="Instagram" data-c>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg></a>
+</footer>
+
+<script>
+/* ============ CONTENT ============ */
+// Replace `src` with your image/video path (e.g. 'media/lumen.jpg' or 'media/lumen.mp4'). Empty = placeholder.
+const PROJECTS=[
+ {t:'Project 01',c:'Brand Film',y:'2026',src:'',pa:'#3a2bff',pb:'#ff3d1f'},
+ {t:'Project 02',c:'Photography',y:'2026',src:'',pa:'#ff3d1f',pb:'#7a1d6e'},
+ {t:'Project 03',c:'Podcast',y:'2025',src:'',pa:'#1b1340',pb:'#3a2bff'},
+ {t:'Project 04',c:'Advertising',y:'2025',src:'',pa:'#c9ff2e',pb:'#0f7a4a'},
+ {t:'Project 05',c:'Branding',y:'2025',src:'',pa:'#ff3d1f',pb:'#c9ff2e'}];
+const ASPECT=['16:10','4:5','1:1','16:10','3:4'], MOBILE_ASPECT=['4:5','4:5','1:1','4:3','3:4'];
+const TEAM=[['Yassine','Creative Director','media/team-yassine.jpg'],['Oumaima','Lead Cinematographer','media/team-oumaima.jpg'],['Nasr','Executive Producer','media/team-nasr.jpg'],['Yucha','Art Director','media/team-yucha.jpg']];
+const SVC_COLORS=['#ff3d1f','#6a5cff','#c9ff2e','#ff3d1f','#6a5cff','#c9ff2e'];
+const SVC={
+ en:[['Podcasts','Set design, multi-cam filming and audio for shows that last.'],['Photography','Shoots for editorial, product and people — made for real use.'],['Filmmaking','Brand films and documentaries, concept to final cut.'],['Advertising','Campaigns built around one clear, unforgettable idea.'],['Branding','Identities and creative direction that hold together.'],['Content','Platform-native content, fast, without losing craft.']],
+ fr:[['Podcasts','Décor, tournage multicaméra et son pour des émissions qui durent.'],['Photographie','Éditorial, produit, portrait — pensés pour leur usage réel.'],['Cinéma','Films de marque et documentaires, du concept au montage final.'],['Publicité','Des campagnes construites autour d’une idée forte.'],['Branding','Identités et direction créative cohérentes.'],['Contenu','Contenus natifs des plateformes, vite et avec exigence.']],
+ ar:[['بودكاست','ديكور وتصوير متعدد الكاميرات وصوت لبرامج تدوم.'],['تصوير','جلسات تحريرية ومنتجات وأشخاص — لاستخدام حقيقي.'],['أفلام','أفلام علامات ووثائقية من الفكرة إلى المونتاج.'],['إعلانات','حملات مبنية على فكرة واحدة لا تُنسى.'],['هوية','هويات وتوجيه إبداعي متماسك.'],['محتوى','محتوى مناسب للمنصات بسرعة وحِرفية.']]};
+const dict={
+ en:{"nav.work":"Work","nav.about":"Studio","nav.services":"Services","nav.team":"Team","nav.contact":"Contact","hero.eyebrow":"Communication & Design Studio","hero.tagline":"We make what people remember.","hero.scroll":"Scroll ↓","about.eyebrow":"About Spaceprod","about.statement":"We are a communication and design studio. We shoot, film, record, brand and direct — turning ideas into things people actually feel.","about.body":"From podcasts to campaigns, from quiet portraits to loud launches: one team, one eye, every format.","services.eyebrow":"What we do","work.heading":"Work","work.eyebrow":"Selected projects — scroll","reel.eyebrow":"Reel","reel.p":"A few seconds of how we work: fast, hands-on, and always on set.","team.eyebrow":"The people","team.heading":"The Crew","contact.eyebrow":"Get in touch","footer.tagline":"Communication & Design Studio","reel.h":"Shot <em>on set</em>, not on screen."},
+ fr:{"nav.work":"Travaux","nav.about":"Studio","nav.services":"Services","nav.team":"Équipe","nav.contact":"Contact","hero.eyebrow":"Studio de communication & design","hero.tagline":"Nous créons ce dont on se souvient.","hero.scroll":"Défiler ↓","about.eyebrow":"À propos de Spaceprod","about.statement":"Nous sommes un studio de communication et de design. Nous photographions, filmons, enregistrons, créons des marques — pour transformer des idées en émotions.","about.body":"Des podcasts aux campagnes, des portraits discrets aux lancements bruyants : une équipe, un regard, tous les formats.","services.eyebrow":"Ce que nous faisons","work.heading":"Travaux","work.eyebrow":"Projets choisis — défilez","reel.eyebrow":"Reel","reel.p":"Quelques secondes de notre façon de travailler : rapide, concrète, toujours sur le plateau.","team.eyebrow":"Les créateurs","team.heading":"L’Équipe","contact.eyebrow":"Contactez-nous","footer.tagline":"Studio de communication & design","reel.h":"Filmé <em>sur le plateau</em>, pas à l’écran."},
+ ar:{"nav.work":"الأعمال","nav.about":"الاستوديو","nav.services":"الخدمات","nav.team":"الفريق","nav.contact":"تواصل","hero.eyebrow":"استوديو تواصل وتصميم","hero.tagline":"نصنع ما يبقى في الذاكرة.","hero.scroll":"مرّر ↓","about.eyebrow":"عن سبيسبرود","about.statement":"نحن استوديو تواصل وتصميم. نصوّر ونُنتج ونسجّل ونبني العلامات — لنحوّل الأفكار إلى شيء يشعر به الناس.","about.body":"من البودكاست إلى الحملات، ومن البورتريه الهادئ إلى الإطلاقات الصاخبة: فريق واحد وعين واحدة وكل الصيغ.","services.eyebrow":"ماذا نقدّم","work.heading":"الأعمال","work.eyebrow":"مشاريع مختارة — مرّر","reel.eyebrow":"ريل","reel.p":"ثوانٍ من طريقة عملنا: سريعة وعملية ودائمًا في موقع التصوير.","team.eyebrow":"الأشخاص","team.heading":"الفريق","contact.eyebrow":"تواصل معنا","footer.tagline":"استوديو تواصل وتصميم","reel.h":"صُوّر <em>في الموقع</em> لا على الشاشة."}};
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let lang='en',words=[],wp=0;
+function paintWords(){const n=Math.round(wp*words.length);words.forEach((w,i)=>w.classList.toggle('on',i<n))}
+function applyLang(l){
+  lang=l;const d=dict[l];
+  $$('[data-k]').forEach(e=>e.textContent=d[e.dataset.k]);
+  document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';
+  $('#reelH').innerHTML=d['reel.h'];
+  $('#statement').innerHTML=d['about.statement'].split(' ').map(w=>`<span class="w">${w}</span>`).join(' ');
+  words=$$('#statement .w');paintWords();
+  buildServices();
+  $$('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));
+  try{localStorage.setItem('sp-lang',l)}catch(e){}
+  window.ScrollTrigger&&ScrollTrigger.refresh();
+}
+function applyTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('sp-theme',t)}catch(e){}}
+function buildServices(){
+  $('#svcList').innerHTML=SVC[lang].map((s,i)=>`<div class="svc" style="--sc:${SVC_COLORS[i]}" data-c><i>0${i+1}</i><b>${s[0]}</b><p>${s[1]}</p></div>`).join('');
+  $$('.svc').forEach(r=>{const on=()=>{$$('.svc').forEach(x=>x.classList.remove('active'));r.classList.add('active')};r.onmouseenter=on;r.onclick=on});
+  if(matchMedia('(max-width:899px)').matches)$$('.svc').forEach(r=>r.classList.add('active'));
+}
+
+/* ============ BUILD STATIC DOM ============ */
+$('#heroTitle').innerHTML='SPACEPROD'.split('').map(c=>`<span><b>${c}</b></span>`).join('');
+$('#mq').innerHTML=Array(2).fill(['Podcasts','Photography','Filmmaking','Advertising','Branding','Creative direction','Content'].map(s=>`<span>${s}</span><span><i>✦</i></span>`).join('')).join('');
+$('#teamGrid').innerHTML=TEAM.map(t=>`<div class="team-card" data-c><div class="iw"><img src="${t[2]}" alt="${t[0]}" loading="lazy"></div><div class="team-name">${t[0]}</div><div class="team-role">${t[1]}</div></div>`).join('');
+const isMob=()=>matchMedia('(max-width:800px)').matches;
+$('#stack').insertAdjacentHTML('beforeend',PROJECTS.map((p,i)=>{
+  const m=!p.src?'':/\.(mp4|webm)$/i.test(p.src)?`<video src="${p.src}" autoplay muted loop playsinline></video>`:`<img src="${p.src}" alt="${p.t}">`;
+  const ph=p.src?'':`<div class="ph" style="--pa:${p.pa};--pb:${p.pb}"><div>Drop media here<span>${ASPECT[i]} · desktop<br>${MOBILE_ASPECT[i]} · mobile</span></div></div>`;
+  return `<article class="sc c${i+1}" data-c><div class="media">${m}${ph}<div class="cap"><b>${p.t}</b><small>${p.c} · ${p.y}</small></div></div></article>`}).join(''));
+$('#mail').setAttribute('data-c','');
+
+/* ============ INIT ============ */
+let sT='dark',sL='en';
+try{sT=localStorage.getItem('sp-theme')||'dark';sL=localStorage.getItem('sp-lang')||'en'}catch(e){}
+applyTheme(sT);applyLang(sL);
+$$('[data-lang]').forEach(b=>b.onclick=()=>applyLang(b.dataset.lang));
+$('#themeBtn').onclick=$('#themeBtnM').onclick=()=>applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light');
+$('#menuBtn').onclick=()=>$('#mnav').classList.toggle('open');
+
+gsap.registerPlugin(ScrollTrigger);
+let lenis=null;
+if(!reduced){lenis=new Lenis({lerp:.09});lenis.on('scroll',ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0)}
+$$('[data-go]').forEach(b=>b.onclick=()=>{$('#mnav').classList.remove('open');const el=document.getElementById(b.dataset.go);lenis?lenis.scrollTo(el,{duration:1.6}):el.scrollIntoView({behavior:'smooth'})});
+
+/* cursor + magnetic */
+if(matchMedia('(hover:hover) and (pointer:fine)').matches){
+  const cur=$('#cur'),cx=gsap.quickTo(cur,'x',{duration:.25}),cy=gsap.quickTo(cur,'y',{duration:.25});
+  addEventListener('pointermove',e=>{cx(e.clientX);cy(e.clientY)});
+  document.addEventListener('pointerover',e=>{gsap.to(cur,{scale:e.target.closest('[data-c]')?3.2:1,duration:.3})});
+  const mail=$('#mail');
+  mail.addEventListener('pointermove',e=>{const r=mail.getBoundingClientRect();gsap.to(mail,{x:(e.clientX-r.left-r.width/2)*.25,y:(e.clientY-r.top-r.height/2)*.4,duration:.4})});
+  mail.addEventListener('pointerleave',()=>gsap.to(mail,{x:0,y:0,duration:.6,ease:'elastic.out(1,.4)'}));
+}
+
+/* ============ LIQUID HERO (WebGL, half-res, paused offscreen, CSS fallback) ============ */
+const mouse={x:.5,y:.5,tx:.5,ty:.5,vx:0,vy:0};
+function initLiquid(){
+  const hero=$('#hero'),cv=$('#liquid');
+  const weak=reduced||(navigator.hardwareConcurrency||4)<=2||(navigator.deviceMemory||4)<=2;
+  const gl=!weak&&cv.getContext('webgl',{antialias:false,alpha:false,powerPreference:'low-power'});
+  if(!gl){hero.classList.add('nogl');return}
+  const vs='attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+  const fs=`precision mediump float;uniform vec2 r,m,v;uniform float t;
+  float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+  float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+1.),f.x),f.y);}
+  float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*n(p);p=p*2.03+7.1;a*=.5;}return s;}
+  void main(){
+    vec2 uv=gl_FragCoord.xy/r;vec2 p=(uv-.5)*vec2(r.x/r.y,1.)*2.;
+    vec2 mp=(m-.5)*vec2(r.x/r.y,1.)*2.;vec2 d=p-mp;float f=exp(-dot(d,d)*3.5);
+    p+=f*(vec2(-d.y,d.x)*1.6+v*5.);
+    float q=fbm(p*1.1+vec2(t*.06,-t*.04));
+    float w=fbm(p*1.4+q*2.6+vec2(-t*.05,t*.07));
+    vec3 c0=vec3(.035,.02,.06),c1=vec3(.23,.17,1.),c2=vec3(1.,.24,.12),c3=vec3(.79,1.,.18);
+    vec3 col=mix(c0,c1,smoothstep(.25,.62,w));
+    col=mix(col,c2,smoothstep(.5,.82,q*.9+w*.5)*.95);
+    col+=c3*pow(smoothstep(.72,.95,w+f*.12),3.)*.55;
+    col+=f*.12;
+    col*=mix(.55,1.,smoothstep(1.2,-.2,uv.y*1.1-.1));
+    gl_FragColor=vec4(col,1.);}`;
+  const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);return o};
+  const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr,gl.LINK_STATUS)){hero.classList.add('nogl');return}
+  gl.useProgram(pr);gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  const U=k=>gl.getUniformLocation(pr,k);const ur=U('r'),um=U('m'),uv_=U('v'),ut=U('t');
+  const scale=isMob()?.4:.55;
+  const size=()=>{cv.width=Math.max(2,hero.clientWidth*scale|0);cv.height=Math.max(2,hero.clientHeight*scale|0);gl.viewport(0,0,cv.width,cv.height)};
+  size();addEventListener('resize',size);
+  hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect();mouse.tx=(e.clientX-r.left)/r.width;mouse.ty=1-(e.clientY-r.top)/r.height;mouse.touched=performance.now()});
+  let vis=true,t0=performance.now();new IntersectionObserver(e=>vis=e[0].isIntersecting).observe(hero);
+  (function loop(now){
+    requestAnimationFrame(loop);if(!vis||document.hidden)return;
+    const t=(now-t0)/1000;
+    if(!mouse.touched||now-mouse.touched>2500){mouse.tx=.5+Math.sin(t*.5)*.28;mouse.ty=.5+Math.cos(t*.37)*.2} // idle: it keeps swimming on its own
+    const px=mouse.x,py=mouse.y;mouse.x+=(mouse.tx-mouse.x)*.07;mouse.y+=(mouse.ty-mouse.y)*.07;
+    mouse.vx+=((mouse.x-px)*8-mouse.vx)*.15;mouse.vy+=((mouse.y-py)*8-mouse.vy)*.15;
+    gl.uniform2f(ur,cv.width,cv.height);gl.uniform2f(um,mouse.x,mouse.y);gl.uniform2f(uv_,mouse.vx,mouse.vy);gl.uniform1f(ut,t);
+    gl.drawArrays(gl.TRIANGLES,0,3);
+  })(t0);
+}
+initLiquid();
+
+/* kinetic title: weight swells where the "liquid" (cursor) is */
+const letters=$$('#heroTitle b');
+if(!reduced&&matchMedia('(hover:hover)').matches)gsap.ticker.add(()=>{
+  const cxp=mouse.x*innerWidth;
+  letters.forEach(b=>{const r=b.getBoundingClientRect(),d=Math.abs(r.left+r.width/2-cxp)/innerWidth;b.style.setProperty('--w',Math.round(300+500*Math.max(0,1-d*3)))});
+});
+
+/* ============ LOADER → HERO ============ */
+const prog={v:0};
+gsap.timeline()
+ .to(prog,{v:100,duration:reduced?.1:1.3,ease:'power2.inOut',onUpdate:()=>$('#pct').textContent=Math.round(prog.v)})
+ .to('#loader',{yPercent:-100,duration:.9,ease:'power4.inOut'})
+ .set('#loader',{display:'none'})
+ .to(letters,{y:0,yPercent:0,transform:'translateY(0)',duration:.9,stagger:.05,ease:'power4.out'},'-=.5')
+ .from(['#tagline','.hero-eyebrow','.hero-meta .eyebrow'],{opacity:0,y:16,duration:.8,stagger:.1},'-=.5');
+
+/* ============ SCROLL EFFECTS ============ */
+ScrollTrigger.create({trigger:'#about',start:'top 70%',end:'bottom 60%',onUpdate:s=>{wp=s.progress;paintWords()}});
+gsap.from('.team-card',{opacity:0,y:40,stagger:.1,duration:.8,scrollTrigger:{trigger:'#team',start:'top 70%'}});
+gsap.from('#ctaBig span',{yPercent:60,opacity:0,stagger:.12,duration:.9,ease:'power3.out',scrollTrigger:{trigger:'#cta',start:'top 65%'}});
+gsap.to('.reel-frame',{rotate:-3,y:-40,ease:'none',scrollTrigger:{trigger:'#reel',scrub:true}});
+const vid=$('#reelVid');new IntersectionObserver(e=>e[0].isIntersecting?vid.play().catch(()=>{}):vid.pause()).observe(vid);
+
+/* ---- Layered stack: main card holds centre, others emerge from BEHIND it and fan out ---- */
+const mm=gsap.matchMedia();
+function stackLayout(cfg){
+  const cards=gsap.utils.toArray('#stack .sc'),[main,...rest]=cards;
+  gsap.set(cards,{xPercent:-50,yPercent:-50});
+  // start: secondary cards tucked behind main, only their edges peek out
+  rest.forEach((c,i)=>gsap.set(c,{x:cfg.from[i][0]+'vw',y:cfg.from[i][1]+'vh',scale:.55,rotation:0,filter:'brightness(.45)'}));
+  gsap.set(main,{scale:1,x:0,y:0});
+  const tl=gsap.timeline({defaults:{ease:'power3.inOut'},paused:reduced,
+    scrollTrigger:reduced?null:{trigger:'#stack',pin:true,scrub:.8,start:'top top',end:'+=260%'}});
+  tl.to(main,{scale:cfg.mainScale,y:cfg.mainY+'vh',duration:1},0);
+  rest.forEach((c,i)=>tl.to(c,{x:cfg.to[i][0]+'vw',y:cfg.to[i][1]+'vh',scale:1,rotation:cfg.to[i][2],filter:'brightness(1)',duration:1},.12+i*.12));
+  tl.to('.stack-title',{opacity:1,duration:.5},.4).to({},{duration:.25});
+  if(reduced)tl.progress(1);
+}
+mm.add('(min-width:801px)',()=>stackLayout({mainScale:.62,mainY:0,
+  from:[[-29,-4],[28,-8],[24,22],[-22,24]],
+  to:[[-35,-6,-4],[34,-20,3],[30,24,-2],[-29,27,4]]}));
+mm.add('(max-width:800px)',()=>stackLayout({mainScale:.64,mainY:2,
+  from:[[-20,-12],[20,-14],[-18,14],[18,16]],
+  to:[[-24,-30,-3],[24,-26,3],[-22,31,3],[24,30,-3]]}));
+</script>
+</body>
+</html>
